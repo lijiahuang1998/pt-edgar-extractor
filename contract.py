@@ -26,7 +26,6 @@ class Filing(Enum):
 
 
 FILING = "Which synthetic filing excerpt: f1 to f6"
-MONEY = "Full US dollars as an integer (units already multiplied out); negative for a loss; null when the filing does not contain it"
 
 
 @dataclass
@@ -44,9 +43,9 @@ class FilingOutput(Output):
 @dataclass
 class FieldsOutput(Output):
     filing: Annotated[Filing, "The filing this report is for, copied from the task"]
-    revenue_usd: Annotated[int | None, "Total revenues. " + MONEY]
-    net_income_usd: Annotated[int | None, "Net income (loss). " + MONEY]
-    total_assets_usd: Annotated[int | None, "Total assets at the period end. " + MONEY]
+    revenue_usd: Annotated[int | None, "Total revenues. Full US dollars as an integer (units already multiplied out); negative for a loss; null when the filing does not contain it"]
+    net_income_usd: Annotated[int | None, "Net income (loss). Full US dollars as an integer (units already multiplied out); negative for a loss; null when the filing does not contain it"]
+    total_assets_usd: Annotated[int | None, "Total assets at the period end. Full US dollars as an integer (units already multiplied out); negative for a loss; null when the filing does not contain it"]
 
 
 @dataclass
