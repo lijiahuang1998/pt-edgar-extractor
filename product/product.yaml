@@ -1,0 +1,11 @@
+_ > nanoagent.plugin.v0001.ProductConfig:
+tagline: "Pull three headline numbers out of a filing"
+summary: "Pick a synthetic 10-K or 10-Q excerpt and the agent extracts revenue, net income and total assets in full US dollars, handling units, column order, losses in parentheses and missing fields. A program holds the exact answer."
+highlights:
+  - "Fictional companies; the answer key comes from the values the text was built from"
+  - "Traps built in: thousands vs millions, prior-year column first, net loss, 10-Q quarter vs nine months, missing balance sheet"
+  - "Exact integer match per field, null where the filing has no value"
+steps:
+  - "Choose a filing, f1 to f6"
+  - "The agent reads the filing text"
+  - "It reports three integers in USD, or null, and the verdict shows which fields are right"

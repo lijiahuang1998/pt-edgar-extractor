@@ -1,0 +1,38 @@
+_ > nanoagent.plugin.v0001.ManifestConfig:
+id: pt-edgar-extractor
+name: EDGAR Extractor
+version: 0.1.0
+status: ready
+spec: nanoagent.plugin/v0001
+
+runtime > nanoagent.plugin.v0001.RuntimeConfig:
+  type: mcp_stdio
+  command: [uv, run, --frozen, python, -m, plugin]
+
+permissions > nanoagent.plugin.v0001.PermissionsConfig:
+  network > nanoagent.plugin.v0001.NetworkConfig:
+    hosts: []
+  filesystem > nanoagent.plugin.v0001.FilesystemConfig:
+    write: [workspace]
+
+# One entry per contract.Tool; its input and output classes are contract.TOOLS's.
+tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
+  get_filing:
+    description: Read one of six synthetic SEC-style filing excerpts (f1 to f6, 10-K or 10-Q) as plain text
+  pin_fields:
+    description: Pin the task's answer key, the exact revenue, net income and total assets the filing was built from, out of the model's sight
+
+# One entry per contract.Task; its input class is contract.TASKS's.
+tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
+  extract-fields:
+    description: Extract a filing's revenue, net income and total assets in full US dollars, with null for a value the excerpt does not contain
+    runner: agent
+    tools: [get_filing]
+    reference: pin_fields
+    instructions: |-
+      Fields. revenue_usd is the line "Total revenues", net_income_usd is "Net income (loss)", total_assets_usd is "Total assets". Ignore other lines such as cost of revenues, total liabilities and the discussion text.
+      Period. For a 10-K, use the fiscal year ended December 31, 2025; read the column headers, because the order of the columns changes from filing to filing. For a 10-Q, use the three-month column of the latest quarter (3M Sep 2025), never the nine-month column, and the balance sheet at Sep 30, 2025.
+      Units. The header names the unit: "in thousands" means multiply by 1,000, "in millions" by 1,000,000, "in dollars" by 1. Report full US dollars as integers, for example 4,218,330 in thousands is 4218330000.
+      Signs. A number in parentheses is negative: (54,307) is -54307 before the unit is applied.
+      Missing. If the excerpt does not contain a field (for example it has no balance sheet), report null for it. Never guess and never report 0 for a missing value.
+      Plan. Exactly two steps: (1) call get_filing once, with the task input copied exactly as given; (2) submit filing (copied from the task), revenue_usd, net_income_usd and total_assets_usd.
